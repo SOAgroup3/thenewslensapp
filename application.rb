@@ -10,6 +10,13 @@ class ThenewslensApp < Sinatra::Base
       newsfound.first(number)
     end
 
+    def show_col(col_name)
+      newsfound = Thenewslensapi::NewsLens.gets_news
+      newsfound.each do |i|
+        i.col_name
+      end
+    end
+
   end
 
   get '/' do
@@ -20,4 +27,13 @@ class ThenewslensApp < Sinatra::Base
     content_type :json, 'charset' => 'utf-8'
     get_news(params[:number]).to_json
   end
- end
+
+  post '/api/v1/specify.json' do
+    content_type :json, 'charset' => 'utf-8'
+    
+    #get all post parameter
+    req = JSON.parse(request.body.read)
+    col_name = req['col_name']
+    showcol(col_name).to_json
+  end
+end
