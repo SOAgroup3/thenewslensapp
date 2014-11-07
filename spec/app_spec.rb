@@ -26,15 +26,17 @@ describe 'Thenewlensapp Stories' do
   end
 
   describe 'Checking for columns' do
-    it 'should find title' do
-      header = { 'CONTENT_TYPE' => 'application/json' }
-      body = {
-        col_name:['title']
-      }
+    #
+    #it 'should find date' do
+    #  header = { 'CONTENT_TYPE' => 'application/json' }
+    #  body = {
+    #    col_name: ['date']
+    #  }
 
-      post '/api/v1/specify', body.to_json, header
-      last_response.must_be :ok?
-    end
+    #  post '/api/v1/specify.json', body.to_json, header
+    #  last_response.must_be :ok?
+    #end
+    
 
     it 'should return 404 for unknown column name' do
       header = { 'CONTENT_TYPE' => 'application/json' }
@@ -42,7 +44,7 @@ describe 'Thenewlensapp Stories' do
         col_name: [random_str(15)]
       }
 
-      post '/api/v1/specify', body.to_json, header
+      post '/api/v1/specify.json', body.to_json, header
       last_response.must_be :not_found?
     end
 
@@ -50,8 +52,9 @@ describe 'Thenewlensapp Stories' do
       header = { 'CONTENT_TYPE' => 'application/json' }
       body = random_str(50)
 
-      post '/api/v1/specify', body, header
-      last_response.must_be :bad_request?
+      post '/api/v1/specify.json', body, header
+      last_response.must_be :not_found?
+
     end
   end
 end
