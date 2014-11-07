@@ -1,4 +1,6 @@
 
+[ ![Codeship Status for SOAgroup3/thenewslensapp](https://codeship.io/projects/86602b00-4893-0132-feef-3e491b2feacc/status)](https://codeship.io/projects/45905)
+
 ## The-Newslens_App webservice
 
 Authors : LinAnita, peyruchao(peggy) and ethancychen
