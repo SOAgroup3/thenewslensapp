@@ -24,5 +24,4 @@ describe 'Thenewlensapp Stories' do
       last_response.must_be :not_found?
     end
   end
-
 end
