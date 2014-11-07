@@ -1,2 +1,2 @@
-require './application.rb'
+require './app.rb'
 run ThenewslensApp
