@@ -9,7 +9,7 @@ describe 'Thenewlensapp Stories' do
     it 'Should return ok' do
       get '/'
       last_response.must_be :ok?
-      last_response.body.must_match(/thenewlensapp/i)
+      last_response.body.must_match(/thenewslensapp/i)
     end
   end
 
@@ -20,9 +20,41 @@ describe 'Thenewlensapp Stories' do
     end
 
     it 'should return 404 for not a specific number' do
-      get "/api/v1/abc.json"
+      get "/api/v1/#{random_str(20)}.json"
       last_response.must_be :not_found?
     end
   end
 
+  describe 'Checking for columns' do
+    #
+    #it 'should find date' do
+    #  header = { 'CONTENT_TYPE' => 'application/json' }
+    #  body = {
+    #    col_name: ['date']
+    #  }
+
+    #  post '/api/v1/specify.json', body.to_json, header
+    #  last_response.must_be :ok?
+    #end
+    
+
+    it 'should return 404 for unknown column name' do
+      header = { 'CONTENT_TYPE' => 'application/json' }
+      body = {
+        col_name: [random_str(15)]
+      }
+
+      post '/api/v1/specify.json', body.to_json, header
+      last_response.must_be :not_found?
+    end
+
+    it 'should return 400 for bad JSON formatting' do
+      header = { 'CONTENT_TYPE' => 'application/json' }
+      body = random_str(50)
+
+      post '/api/v1/specify.json', body, header
+      last_response.must_be :not_found?
+
+    end
+  end
 end
