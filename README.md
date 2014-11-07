@@ -36,7 +36,5 @@ It will show the four information of the news.
 If users use the POST function by thaking /api/v1/specify.json
 
 It will show the four information of the news.
-
 Example:
-
 ```[{"title":"歐巴馬難逃「六年之癢」詛咒 民主黨期中選舉恐被拖垮"},{"title":"挽救選情顧鐵票 藍營立委擬恢復軍公教年終慰問金"},{"title":"美軍撤離中國接收 外媒：中國「無需流一滴血」就成為阿富汗的終極贏家"},{"title":"關廠工人案宣告落幕 勞動部完成96%退款作業"},{"title":"立法院初審通過僱主性別歧視 罰鍰上修至150萬"},{"title":"【插畫】「賣完了！吃其他的」，三張圖看港台飲食習慣大不同"},{"title":"攝影師帶你看世界：超精采3分半鐘影片，看完彷彿也環遊了世界"} ```
