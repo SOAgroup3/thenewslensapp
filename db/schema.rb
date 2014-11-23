@@ -14,9 +14,7 @@
 ActiveRecord::Schema.define(version: 20141116101613) do
 
   create_table "tutorials", force: true do |t|
-    t.string   "title"
-    t.string   "author"
-    t.string   "date"
+    t.string   "number"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

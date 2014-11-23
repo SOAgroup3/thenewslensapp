@@ -1,3 +1,4 @@
+
 [ ![Codeship Status for SOAgroup3/thenewslensapp](https://codeship.io/projects/86602b00-4893-0132-feef-3e491b2feacc/status)](https://codeship.io/projects/45905)
 
 ## The-Newslens_App webservice
@@ -6,7 +7,7 @@ Authors : LinAnita, peyruchao(peggy) and ethancychen
 
 ## Heroku web service
 
-> https://thenewslensapp2.herokuapp.com/
+> https://thenewslensapp.herokuapp.com
 
 ### Introduction: Read the hot news from The News Lens ( http://www.thenewslens.com )
 
@@ -24,9 +25,6 @@ Authors : LinAnita, peyruchao(peggy) and ethancychen
 - POST  /api/v1/specify.json
    takes JSON: array of column header
    returns: array of news titles on NewLens 
-
-- GET   /api/v1/tutorial/:number
-	return specific number of records that stored in database 
 
 > <pre>
 
