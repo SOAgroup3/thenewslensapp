@@ -7,7 +7,7 @@ Authors : LinAnita, peyruchao(peggy) and ethancychen
 
 ## Heroku web service
 
-> https://thenewslensapp.herokuapp.com
+> https://thenewslensapp2.herokuapp.com
 
 ### Introduction: Read the hot news from The News Lens ( http://www.thenewslens.com )
 
