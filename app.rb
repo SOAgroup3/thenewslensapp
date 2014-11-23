@@ -1,10 +1,15 @@
 require 'sinatra/base'
 require 'thenewslensapi'
 require 'json'
-require './academy'
+require_relative 'model/tutorial'
+
+require 'haml'
+require 'sinatra/flash'
 
 # Simple version of nba_scrapper
 class ThenewslensApp < Sinatra::Base
+  enable :sessions
+  register Sinatra::Flash
 
   configure :production, :development do
     enable :logging
@@ -16,9 +21,7 @@ class ThenewslensApp < Sinatra::Base
         newsfound = Thenewslensapi::NewsLens.gets_news
         if /^\d+$/.match(number)         
           newsfound.first(number.to_i)
-        else
-          newsfound.first(number)
-        end
+        end          
       rescue
         halt 404
       end
@@ -27,25 +30,57 @@ class ThenewslensApp < Sinatra::Base
     def show_col(col_name)
       begin
         newsfound = Thenewslensapi::NewsLens.gets_news
+        news_return=Array.new
         newsfound.each do |i|
-          i.col_name
+          news_return.push('title'=> i['title'])
         end
+        news_return
       rescue
         halt 404
       end
     end
-  end
+
+    def current_page?(path = ' ')
+      path_info = request.path_info
+      path_info += ' ' if path_info == '/'
+      request_path = path_info.split '/'
+      request_path[1] == path
+    end
+
+  end #helpers
 
     get '/' do
-    'Thenewslensapp is up and working'
+      haml :home
     end
+
+  get '/news' do
+    @number = params[:number]
+    if @number
+      redirect "/news/#{@number}"
+      return nil
+    end
+
+    haml :news
+  end
+
+  get '/news/:number' do
+
+    @news = get_news(params[:number])
+
+    if @news.nil?
+      flash[:notice] = 'no news found'
+      redirect '/news'
+    end
+
+    haml :news
+  end
 
     get '/api/v1/:number.json' do
       content_type :json, 'charset' => 'utf-8'
       begin
         get_news(params[:number]).to_json
       rescue
-        halt 404 
+        halt 404
       end
     end
 
@@ -55,7 +90,7 @@ class ThenewslensApp < Sinatra::Base
         #get all post parameter
         req = JSON.parse(request.body.read)
         col_name = req['col_name']
-        showcol(col_name).to_json
+        show_col(col_name).to_json
       rescue
         halt 404
       end
@@ -72,9 +107,7 @@ class ThenewslensApp < Sinatra::Base
       end
 
       tutorial = Tutorial.new
-      tutorial.title = req['title'].to_json
-      tutorial.author = req['author'].to_json
-      tutorial.date = req['date'].to_json
+      tutorial.number = req['number'].to_json
 
       if tutorial.save
         status 201
@@ -86,14 +119,12 @@ class ThenewslensApp < Sinatra::Base
       content_type :json
       begin
         @tutorial = Tutorial.find(params[:id])
-        title = JSON.parse(@tutorial.title)
-        author = JSON.parse(@tutorial.author)
-        date = JSON.parse(@tutorial.date)
-        logger.info({ title: title, author: author, date: date }.to_json)
+        number = JSON.parse(@tutorial.number)
+        logger.info({ number: number }.to_json)
       rescue
         halt 400
       end
       
-      get_news(:id).to_json
+      get_news(number[0].to_s).to_json
     end
 end

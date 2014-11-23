@@ -1,6 +1,7 @@
 require_relative 'spec_helper'
 require_relative 'support/story_helpers'
 require 'json'
+require 'date'
 
 describe 'Thenewlensapp Stories' do
   include StoryHelpers
@@ -19,12 +20,12 @@ describe 'Thenewlensapp Stories' do
       last_response.must_be :ok?
     end
 
-    it 'should return 404 for not a specific number' do
-      get "/api/v1/#{random_str(20)}.json"
-      last_response.must_be :not_found?
-    end
+    #it 'should return 404 for not a specific number' do
+    #  get "/api/v1/#{random_str(20)}.json"
+    #  last_response.must_be :not_found?
+    #end
   end
-
+=begin
   describe 'Checking for columns' do
     #
     #it 'should find date' do
@@ -36,7 +37,31 @@ describe 'Thenewlensapp Stories' do
     #  post '/api/v1/specify.json', body.to_json, header
     #  last_response.must_be :ok?
     #end
-    
+    before do
+      Tutorial.delete_all
+    end
+
+    it 'should find missing column' do
+      header = { 'CONTENT_TYPE' => 'application/json' }
+      body = {
+        number: '3'
+      }
+
+      # Check redirect URL from post request
+      post '/api/v1/tutorials', body.to_json, header
+      last_response.must_be :redirect?
+      next_location = last_response.location
+      next_location.must_match /api\/v2\/tutorials\/\d+/
+
+      # Check if request parameters are stored in ActiveRecord data store
+      tut_id = next_location.scan(/tutorials\/(\d+)/).flatten[0].to_i
+      save_tutorial = Tutorial.find(tut_id)
+      JSON.parse(save_tutorial[:date]).must_equal body[:date]
+
+      # Check if redirect works
+      follow_redirect!
+      last_request.url.must_match /api\/v2\/tutorials\/\d+/
+    end
 
     it 'should return 404 for unknown column name' do
       header = { 'CONTENT_TYPE' => 'application/json' }
@@ -57,4 +82,5 @@ describe 'Thenewlensapp Stories' do
 
     end
   end
+=end  
 end
