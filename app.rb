@@ -24,7 +24,10 @@ class ThenewslensApp < Sinatra::Base
           #.each do |title,author,date|
           #  news_return.push('title'=> title ,'author'=> author ,'date'=> date)
           #end
+        else
+          newsfound
         end
+
       rescue
         halt 404
       end
