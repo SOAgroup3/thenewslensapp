@@ -1,9 +1,7 @@
 class CreateTutorials < ActiveRecord::Migration
   def self.up
     create_table :tutorials do |t|
-      t.string :title
-      t.string :author
-      t.string :date
+      t.string :number
       t.timestamps
     end
   end
