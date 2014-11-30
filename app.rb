@@ -21,7 +21,9 @@ class ThenewslensApp < Sinatra::Base
         newsfound = Thenewslensapi::NewsLens.gets_news
         if /^\d+$/.match(number)         
           newsfound.first(number.to_i)
-        end          
+        
+        else raise "ouch"
+        end                
       rescue
         halt 404
       end
@@ -31,8 +33,11 @@ class ThenewslensApp < Sinatra::Base
       begin
         newsfound = Thenewslensapi::NewsLens.gets_news
         news_return=Array.new
-        newsfound.each do |i|
-          news_return.push('title'=> i['title'])
+        newsfound.each do |i|          
+          if i.has_key?(col_name[0])
+            news_return.push(col_name=> i[col_name[0]])
+          else raise "ouch col"
+          end
         end
         news_return
       rescue
@@ -49,9 +54,9 @@ class ThenewslensApp < Sinatra::Base
 
   end #helpers
 
-    get '/' do
-      haml :home
-    end
+  get '/' do
+    haml :home
+  end
 
   get '/news' do
     @number = params[:number]
@@ -75,56 +80,59 @@ class ThenewslensApp < Sinatra::Base
     haml :news
   end
 
-    get '/api/v1/:number.json' do
-      content_type :json, 'charset' => 'utf-8'
-      begin
-        get_news(params[:number]).to_json
-      rescue
-        halt 404
-      end
+  get '/api/v1/:number.json' do
+    content_type :json, 'charset' => 'utf-8'
+    begin
+      get_news(params[:number]).to_json
+    rescue
+      halt 404
+    end
+  end
+
+  post '/api/v1/specify.json' do
+    #in tux ,type:
+    #  post '/api/v1/specify.json' , "{\"col_name\": [\"title\"]}"
+    #
+    content_type :json, 'charset' => 'utf-8'
+    begin
+      #get all post parameter
+      req = JSON.parse(request.body.read)
+      col_name = req['col_name']
+      show_col(col_name).to_json
+    rescue
+      halt 404
+    end
+  end
+
+
+  post '/api/v1/tutorials' do
+    content_type :json
+    begin
+      req = JSON.parse(request.body.read)
+      logger.info req
+    rescue
+      halt 400
     end
 
-    post '/api/v1/specify.json' do
-      content_type :json, 'charset' => 'utf-8'
-      begin
-        #get all post parameter
-        req = JSON.parse(request.body.read)
-        col_name = req['col_name']
-        show_col(col_name).to_json
-      rescue
-        halt 404
-      end
+    tutorial = Tutorial.new
+    tutorial.number = req['number'].to_json
+
+    if tutorial.save
+      status 201
+      redirect "/api/v1/tutorials/#{tutorial.id}"
     end
+  end
 
-
-    post '/api/v1/tutorials' do
-      content_type :json
-      begin
-        req = JSON.parse(request.body.read)
-        logger.info req
-      rescue
-        halt 400
-      end
-
-      tutorial = Tutorial.new
-      tutorial.number = req['number'].to_json
-
-      if tutorial.save
-        status 201
-        redirect "/api/v1/tutorials/#{tutorial.id}"
-      end
+  get '/api/v1/tutorials/:id' do
+    content_type :json
+    begin
+      @tutorial = Tutorial.find(params[:id])
+      number = JSON.parse(@tutorial.number)
+      logger.info({ number: number }.to_json)
+    rescue
+      halt 400
     end
-
-    get '/api/v1/tutorials/:id' do
-      content_type :json
-      begin
-        @tutorial = Tutorial.find(params[:id])
-        number = JSON.parse(@tutorial.number)
-        logger.info({ number: number }.to_json)
-      rescue
-        halt 400
-      end
-      
-      get_news(number[0].to_s).to_json
-    end
+    
+    get_news(number[0].to_s).to_json
+  end
 end
