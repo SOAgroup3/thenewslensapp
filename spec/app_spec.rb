@@ -67,6 +67,28 @@ describe 'Thenewlensapp Stories' do
     before do
       Tutorial.delete_all
     end
+
+    it 'should find specific query' do
+      header = { 'CONTENT_TYPE' => 'application/json' }
+      body = {
+        number: [3]
+      }
+    
+      # Check redirect URL from post request
+      post '/api/v1/tutorials', body.to_json, header
+      last_response.must_be :redirect?
+      next_location = last_response.location
+      next_location.must_match /api\/v1\/tutorials\/\d+/
+
+      # Check if request parameters are stored in ActiveRecord data store
+      tut_id = next_location.scan(/tutorials\/(\d+)/).flatten[0].to_i
+      save_tutorial = Tutorial.find(tut_id)
+      JSON.parse(save_tutorial[:number]).must_equal body[:number]
+
+      # Check if redirect works
+      follow_redirect!
+      last_request.url.must_match /api\/v1\/tutorials\/\d+/
+    end
   end
 
 end
