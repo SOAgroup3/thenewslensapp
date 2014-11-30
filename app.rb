@@ -6,6 +6,8 @@ require_relative 'model/tutorial'
 require 'haml'
 require 'sinatra/flash'
 
+require 'httparty'
+
 # Simple version of nba_scrapper
 class ThenewslensApp < Sinatra::Base
   enable :sessions
@@ -14,6 +16,10 @@ class ThenewslensApp < Sinatra::Base
   configure :production, :development do
     enable :logging
   end
+
+
+  API_BASE_URI = 'http://localhost:9292'
+
 
 	helpers do
     def get_news(number)
@@ -79,6 +85,61 @@ class ThenewslensApp < Sinatra::Base
 
     haml :news
   end
+
+    get '/tutorials' do
+    @action = :create
+    haml :tutorials
+  end
+
+  post '/tutorials' do
+    request_url = "#{API_BASE_URI}/api/v1/tutorials"
+    number = params[:number].split("\r\n")
+    params_h = {
+      number: number
+    }
+
+    options =  {  body: params_h.to_json,
+                  headers: { 'Content-Type' => 'application/json' }
+               }
+
+    result = HTTParty.post(request_url, options)
+
+    if (result.code != 200)
+      flash[:notice] = 'number not found'
+      redirect '/tutorials'
+      return nil
+    end
+
+    id = result.request.last_uri.path.split('/').last
+    session[:result] = result.to_json
+    session[:number] = number
+    session[:action] = :create
+    redirect "/tutorials/#{id}"
+  end
+
+  get '/tutorials/:id' do
+    if session[:action] == :create
+      @results = JSON.parse(session[:result])
+      @number = session[:number]
+    else
+      request_url = "#{API_BASE_URI}/api/v2/tutorials/#{params[:id]}"
+      options =  { headers: { 'Content-Type' => 'application/json' } }
+      result = HTTParty.get(request_url, options)
+      @results = result
+    end
+
+    @id = params[:id]
+    @action = :update
+    haml :tutorials
+  end
+
+  delete '/tutorials/:id' do
+    request_url = "#{API_BASE_URI}/api/v2/tutorials/#{params[:id]}"
+    result = HTTParty.delete(request_url)
+    flash[:notice] = 'record of tutorial deleted'
+    redirect '/tutorials'
+  end
+
 
   get '/api/v1/:number.json' do
     content_type :json, 'charset' => 'utf-8'
