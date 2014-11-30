@@ -21,10 +21,7 @@ class ThenewslensApp < Sinatra::Base
         newsfound = Thenewslensapi::NewsLens.gets_news
         if /^\d+$/.match(number)         
           newsfound.first(number.to_i)
-          #.each do |title,author,date|
-          #  news_return.push('title'=> title ,'author'=> author ,'date'=> date)
-          #end
-        end
+        end          
       rescue
         halt 404
       end
@@ -67,10 +64,11 @@ class ThenewslensApp < Sinatra::Base
   end
 
   get '/news/:number' do
+
     @news = get_news(params[:number])
 
     if @news.nil?
-      flash[:notice] = 'no news found' if @newsfound.nil?
+      flash[:notice] = 'no news found'
       redirect '/news'
     end
 
@@ -82,7 +80,7 @@ class ThenewslensApp < Sinatra::Base
       begin
         get_news(params[:number]).to_json
       rescue
-        halt 404 
+        halt 404
       end
     end
 
