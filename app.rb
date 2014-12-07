@@ -19,7 +19,7 @@ class ThenewslensApp < Sinatra::Base
   end
 
 
-  API_BASE_URI = 'http://localhost:9292'
+  API_BASE_URI = 'thenewslensapp2.herokuapp.com'
 
 
 	helpers do
