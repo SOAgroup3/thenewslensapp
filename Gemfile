@@ -4,6 +4,7 @@ gem 'sinatra'
 gem 'sinatra-contrib'
 gem 'thenewslensapi'
 gem 'json'
+gem 'httparty'
 
 gem 'sinatra-flash'
 gem 'haml'
