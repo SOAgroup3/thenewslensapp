@@ -19,7 +19,7 @@ class ThenewslensApp < Sinatra::Base
   end
 
 
-  API_BASE_URI = 'thenewslensapp2.herokuapp.com'
+  API_BASE_URI = 'https://thenewslensapp2.herokuapp.com'
 
 
 	helpers do
