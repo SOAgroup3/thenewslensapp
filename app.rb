@@ -12,6 +12,7 @@ require 'httparty'
 class ThenewslensApp < Sinatra::Base
   enable :sessions
   register Sinatra::Flash
+  use Rack::MethodOverride
 
   configure :production, :development do
     enable :logging
@@ -86,7 +87,7 @@ class ThenewslensApp < Sinatra::Base
     haml :news
   end
 
-    get '/tutorials' do
+  get '/tutorials' do
     @action = :create
     haml :tutorials
   end
@@ -94,6 +95,7 @@ class ThenewslensApp < Sinatra::Base
   post '/tutorials' do
     request_url = "#{API_BASE_URI}/api/v1/tutorials"
     number = params[:number].split("\r\n")
+    column = params[:column].split("\r\n")
     params_h = {
       number: number
     }
@@ -113,6 +115,7 @@ class ThenewslensApp < Sinatra::Base
     id = result.request.last_uri.path.split('/').last
     session[:result] = result.to_json
     session[:number] = number
+    session[:column] = column
     session[:action] = :create
     redirect "/tutorials/#{id}"
   end
@@ -121,8 +124,9 @@ class ThenewslensApp < Sinatra::Base
     if session[:action] == :create
       @results = JSON.parse(session[:result])
       @number = session[:number]
+      @column = session[:column]
     else
-      request_url = "#{API_BASE_URI}/api/v2/tutorials/#{params[:id]}"
+      request_url = "#{API_BASE_URI}/api/v1/tutorials/#{params[:id]}"
       options =  { headers: { 'Content-Type' => 'application/json' } }
       result = HTTParty.get(request_url, options)
       @results = result
@@ -134,7 +138,7 @@ class ThenewslensApp < Sinatra::Base
   end
 
   delete '/tutorials/:id' do
-    request_url = "#{API_BASE_URI}/api/v2/tutorials/#{params[:id]}"
+    request_url = "#{API_BASE_URI}/api/v1/tutorials/#{params[:id]}"
     result = HTTParty.delete(request_url)
     flash[:notice] = 'record of tutorial deleted'
     redirect '/tutorials'
@@ -165,6 +169,9 @@ class ThenewslensApp < Sinatra::Base
     end
   end
 
+  delete '/api/v1/tutorials/:id' do
+    tutorial = Tutorial.destroy(params[:id])
+  end
 
   post '/api/v1/tutorials' do
     content_type :json
@@ -186,6 +193,7 @@ class ThenewslensApp < Sinatra::Base
 
   get '/api/v1/tutorials/:id' do
     content_type :json
+    logger.info "GET /api/v1/tutorials/#{params[:id]}"
     begin
       @tutorial = Tutorial.find(params[:id])
       number = JSON.parse(@tutorial.number)
